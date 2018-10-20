@@ -15,7 +15,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include "libft/libft.h"
-# define BUFF_SIZE 21101
+# define BUFF_SIZE 32
 
 typedef struct	s_data
 {
