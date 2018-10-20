@@ -1,70 +1,72 @@
 #include "fillit.h"
 
-t_form *creat_form(char path[4][4])
+int get_height(t_hash hashs[4])
+{
+    int max;
+    int min;
+    int k;
+
+    max = hashs[0].i;
+    min = hashs[0].i;
+    k = 1;
+    while (k < 4)
+    {
+        if (hashs[k].i > max)
+            max = hashs[k].i;
+        if (hashs[k].i < min)
+            min = hashs[k].i;
+        k++;
+    }
+    return (max - min + 1);
+}
+
+int get_width(t_hash hashs[4])
+{
+    int max;
+    int min;
+    int k;
+
+    max = hashs[0].j;
+    min = hashs[0].j;
+    k = 1;
+    while (k < 4)
+    {
+        if (hashs[k].j > max)
+            max = hashs[k].j;
+        if (hashs[k].j < min)
+            min = hashs[k].j;
+        k++;
+    }
+    return (max - min + 1);
+}
+
+t_form *creat_form(char valid_str[20])
 {
     t_form *form;
     int i;
     int j;
+    int k;
+    static int l = 64;
 
-    form = (t_form *)malloc(sizeof(t_form));
     i = 0;
     j = 0;
-    while (i++ < 4)
-        while (j++ < 4)
-            form->path[i - 1][j - 1] = path[i - 1][j - 1];
+    k = 0;
+    form = (t_form *)malloc(sizeof(t_form));
     form->x = 0;
     form->y = 0;
-    form->next = NULL;
-    return (form);
-}
-
-t_form  *add_form(t_form *form_root, t_form *form)
-{
-    form->next = form_root;
-    return (form);
-}
-
-t_form  *get_form(t_form *form_root, char path[4][4])
-{
-    int i;
-    int j;
-
-    while(form_root != NULL)
-    {
-        i = 0;
-        j = 0;
-        while (form_root->path[i][j] == path[i][j] && i < 4)
-        {
-            j++;
-            if (j == 4)
-            {
-                i++;
-                j = 0;
-            }
-        }
-        if (i == 4 && j == 0)
-            return (form_root);
-        form_root = form_root->next;
-    }
-    return (NULL);
-}
-
-t_form *str_path_form(char valid_str[20])
-{
-    char    path[4][4];
-    int i;
-    int j;
-
-    i = 0;
-    j = 0;
+    form->l = (char)++l;
     while(i < 20)
     {
-        if (valid_str[i] != '\n')
-        {
-            path[j / 4][j % 4] = valid_str[j];
-            j++;
+        if (valid_str[i] != '\n' && valid_str[i] == '#')
+        {   
+            form->hashs[k].i = j / 4;
+            form->hashs[k++].j = j % 4;
         }
+        if (valid_str[i] != '\n')
+            j++;
         i++;
     }
-    return (creat_form(path));
+    form->width = get_width(form->hashs);
+    form->height = get_height(form->hashs);
+    return (form);
 }

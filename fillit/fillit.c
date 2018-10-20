@@ -1,92 +1,66 @@
 #include "fillit.h"
 
-int final_test(t_hash hashs[4], int valid)
-{
-    int i;
 
-    i = 0;
-    while(i < 4)
-    {
-        if (valid == 0 || hashs[i].relation < 1)
-            return (0);
-        i++;
-    }
-    return (1);
-}
-
-int test_relations(t_hash hashs[4])
+char **creat_plan(int height, int width)
 {
+    char **plan;
     int i;
     int j;
-    int valid;
 
     i = 0;
-    valid = 0;
-    while (i < 4)
+    plan = (char **)malloc(sizeof(char *) * height);
+    while (i < height)
+        plan[i++] = (char *)malloc(sizeof(char) * width);
+    i = 0;
+    while (i++ < height)
     {
         j = 0;
-        while (j < 4)
-        {
-            if (hashs[i].i == hashs[j].i && hashs[i].j + 1 == hashs[j].j)
-                hashs[i].relation++;
-            else if (hashs[i].i == hashs[j].i && hashs[i].j - 1 == hashs[j].j)
-                hashs[i].relation++;
-            else if (hashs[i].i + 1 == hashs[j].i && hashs[i].j == hashs[j].j)
-                hashs[i].relation++;
-            else if (hashs[i].i - 1 == hashs[j].i && hashs[i].j == hashs[j].j)
-                hashs[i].relation++;
-            j++;
-        }
-        if (hashs[i].relation >= 2)
-            valid = 1;
-        ft_putstr("has : ");
-        ft_putnbr(hashs[i].relation);
-        ft_putstr("\n");
-        i++;
+        while(j++ < width)
+            plan[i - 1][j - 1] = '.';
     }
-    return (final_test(hashs, valid));
+    return (plan);
 }
-
-int is_valid_str(char str[20])
+char **add_to_plan(char **plan, t_form *form, int x, int y)
 {
-    t_hash hashs[4];
-    int i;
-    int j;
+    int r;
+    int q;
+
+    r = form->hashs[0].i - x;
+    q = form->hashs[0].j - y;
+    plan[form->hashs[0].i - r][form->hashs[0].j - q] = form->l;
+    plan[form->hashs[1].i - r][form->hashs[1].j - q] = form->l;
+    plan[form->hashs[2].i - r][form->hashs[2].j - q] = form->l;
+    plan[form->hashs[3].i - r][form->hashs[3].j - q] = form->l;
+    return (plan);
+}
+int solve_forms(t_form *form1, t_form *form2)
+{
+    char **plan;
     int k;
-    int conter;
 
     k = 0;
-    i = 0;
-    j = 0;
-    conter = 0;
-    while (i < 20)
+    plan = creat_plan(4, 4);
+    plan = add_to_plan(plan, form1, 0, 0);
+    plan = add_to_plan(plan, form2, 0, 1);
+    while(k++<4)
     {
-        if (str[i] != '#' && str[i] != '.' && str[i] != '\n')
-            return (0);
-        if (str[i] != '\n' && str[i] == '#')
-        {
-            hashs[k].relation = 0;
-            hashs[k].i = j / 4;
-            hashs[k++].j = j % 4;
-            conter++;
-        }
-        if (str[i] != '\n')
-            j++;
-        i++;
+        ft_putstr(plan[k - 1]);
+        ft_putstr("\n");
     }
-    if (conter != 4)
-        return (0);
-    return (test_relations(hashs));
+    return 0;
 }
+
 int main()
 {
     char *buffer;
+    char *buffer2;
+    t_form *forms[26];
 
-    buffer = ft_strdup("....\n.##.\n##..\n....\n");
-    ft_putstr(buffer);
-    if (is_valid_str(buffer) == 0)
-        ft_putstr("sorry no !\n");
-    else
-        ft_putstr("good yes :)\n");
+    buffer = ft_strdup("#...\n#...\n#...\n#...\n");
+    buffer2 = ft_strdup("##..\n.##.\n....\n....\n");
+
+    forms[0] = creat_form(buffer);
+    forms[1] = creat_form(buffer2);
+    solve_forms(forms[0], forms[1]);
     return (0);
 }
