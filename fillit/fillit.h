@@ -19,6 +19,8 @@ typedef struct s_form{
     int width;
     int height;
     char l;
+    int priority;
+    int exist;
 }               t_form;
 
 t_form  *creat_form(char valid_str[20]);
