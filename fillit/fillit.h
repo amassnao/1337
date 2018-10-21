@@ -19,9 +19,12 @@ typedef struct s_form{
     int width;
     int height;
     char l;
-    int priority;
-    int exist;
 }               t_form;
 
+typedef struct s_point
+{
+    int x;
+    int y;
+}               t_point;
 t_form  *creat_form(char valid_str[20]);
 #endif
