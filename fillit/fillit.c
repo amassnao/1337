@@ -65,6 +65,18 @@ char **remove_from_plan(char **plan, t_form *form, t_point coord)
     return (plan);
 }
 
+void affiche_plan(char **plan, t_point size)
+{
+    int i;
+
+    i = 0;
+    while (i++<size.x)
+    {
+        ft_putstr(plan[i - 1]);
+        ft_putchar('\n');
+    }
+}
+
 int check_availibity(char **plan, t_form *form, t_point size, t_point coord)
 {
     int r;
@@ -117,7 +129,6 @@ t_point get_free_place(char **plan, t_form *form, t_point start, t_point size)
 
     while(start.y < size.y)
     {
-        start.x = 0;
         while (start.x < size.x)
         {
             coord.x = start.x;
@@ -126,6 +137,7 @@ t_point get_free_place(char **plan, t_form *form, t_point start, t_point size)
                 return (coord);
             start.x++;
         }
+        start.x = 0;
         start.y++;
     }
     return (coord);
@@ -133,49 +145,72 @@ t_point get_free_place(char **plan, t_form *form, t_point start, t_point size)
 
 int solve_forms(char **plan, t_form *forms[26], t_point start, t_point size, int i)
 {
-    int k;
-    t_point ss;
+    t_point place;
+    t_point new_start;
 
-    k = 0;
     if (forms[i] == NULL)
+        return (1);
+    new_start.x = 0;
+    new_start.y = 0;
+    place = get_free_place(plan,forms[i], start, size);
+    if (place.x != size.x - 1 || place.y != size.y - 1)
+        {
+            plan = add_to_plan(plan, forms[i], place);
+            if (solve_forms(plan, forms, new_start, size, i + 1) == 0)
+            {
+                plan = remove_from_plan(plan, forms[i], place);
+                start.x++;
+                if(start.x == 4)
+                {
+                    start.x = 0;
+                    start.y++;
+                }
+                return (solve_forms(plan, forms, start, size, i));
+            }
+        }
+    else 
         return (0);
-    if  (get_free_place(plan, forms[i], start, size).x == size.x && 
-    get_free_place(plan, forms[i], start, size).y == size.y)
-        return(1);
-    ss = get_free_place(plan, forms[0], start, size);
-    plan = add_to_plan(plan, forms[i],ss);
-    while(k++<size.x)
-    {
-        ft_putstr(plan[k - 1]);
-        ft_putstr("\n");
-    }
-    ft_putstr("\n");
-    plan = remove_from_plan(plan, forms[i], ss);
-    ss.x++;
-    return (solve_forms(plan, forms, ss, size, i));
+    return (1);
 }
 
 int main()
 {
-    char *buffer,*buffer2,*buffer3,*buffer4;
+    char *buffer,*buffer2,*buffer3,*buffer4,*buffer5,*buffer6,*buffer7,*buffer8;
     t_form *forms[26];
     char **plan;
     t_point size;
     t_point start;
+    t_point old_size;
 
-    size.x = size.y = 4;
+
+    size.x = size.y = ft_nextsqrt(8 * 4);
     start.x = start.y = 0;
     plan = creat_plan(size);
-    buffer = ft_strdup("#...\n#...\n#...\n#...\n");
-    buffer2 = ft_strdup("####\n....\n....\n....\n");
-    buffer3 = ft_strdup("##..\n##..\n....\n....\n");
-    buffer4 = ft_strdup("#...\n#...\n#...\n#...\n");
+    buffer = ft_strdup("...#\n...#\n...#\n...#\n");
+    buffer2 = ft_strdup("....\n....\n....\n####\n");
+    buffer3 = ft_strdup(".###\n...#\n....\n....\n");
+    buffer4 = ft_strdup("....\n..##\n.##.\n....\n");
+    buffer5 = ft_strdup("....\n.##.\n.##.\n....\n");
+    buffer6 = ft_strdup("....\n....\n##..\n.##.\n");
+    buffer7 = ft_strdup("##..\n.#..\n.#..\n....\n");
+    buffer8 = ft_strdup("....\n###.\n.#..\n....\n");
 
     forms[0] = creat_form(buffer);
-    //forms[1] = creat_form(buffer3);
-    forms[1] = NULL;
-    //forms[2] = creat_form(buffer3);
-    //forms[3] = creat_form(buffer2);
-    solve_forms(plan, forms, start, size, 0);
+    forms[1] = creat_form(buffer2);
+    forms[2] = creat_form(buffer3);
+    forms[3] = creat_form(buffer4);
+    forms[4] = creat_form(buffer5);
+    forms[5] = creat_form(buffer6);
+    forms[6] = creat_form(buffer7);
+    forms[7] = creat_form(buffer8);
+    forms[8] = NULL;
+    while (solve_forms(plan, forms, start, size, 0) == 0)
+    {
+        old_size = size;
+        size.x = ++size.y;
+        plan = copy_plan(plan, creat_plan(size), old_size);
+        //solve_forms(plan, forms, start, size, 0);
+    }
+    affiche_plan(plan, size);
     return (0);
 }
