@@ -12,19 +12,19 @@ typedef struct s_hash{
     int relation;
 }               t_hash;
 
-typedef struct s_form{
-    t_hash hashs[4];
-    int x;
-    int y;
-    int width;
-    int height;
-    char l;
-}               t_form;
-
 typedef struct s_point
 {
     int x;
     int y;
 }               t_point;
-t_form  *creat_form(char valid_str[20]);
+
+typedef struct s_form{
+    t_point P1;
+    t_point P2;
+    t_point P3;
+    t_point P4;
+    char l;
+}               t_form;
+
+t_form  creat_form(char valid_str[20]);
 #endif

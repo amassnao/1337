@@ -37,31 +37,31 @@ char **creat_plan(t_point size)
     }
     return (plan);
 }
-char **add_to_plan(char **plan, t_form *form, t_point coord)
+char **add_to_plan(char **plan, t_form form, t_point coord)
 {
     int r;
     int q;
 
-    r = form->hashs[0].i - coord.y;
-    q = form->hashs[0].j - coord.x;
-    plan[form->hashs[0].i - r][form->hashs[0].j - q] = form->l;
-    plan[form->hashs[1].i - r][form->hashs[1].j - q] = form->l;
-    plan[form->hashs[2].i - r][form->hashs[2].j - q] = form->l;
-    plan[form->hashs[3].i - r][form->hashs[3].j - q] = form->l;
+    r = form.P1.y - coord.y;
+    q = form.P1.x - coord.x;
+    plan[form.P1.y - r][form.P1.x - q] = form.l;
+    plan[form.P2.y - r][form.P2.x - q] = form.l;
+    plan[form.P3.y - r][form.P3.x - q] = form.l;
+    plan[form.P4.y - r][form.P4.x - q] = form.l;
     return (plan);
 }
 
-char **remove_from_plan(char **plan, t_form *form, t_point coord)
+char **remove_from_plan(char **plan, t_form form, t_point coord)
 {
     int r;
     int q;
 
-    r = form->hashs[0].i - coord.y;
-    q = form->hashs[0].j - coord.x;
-    plan[form->hashs[0].i - r][form->hashs[0].j - q] = '.';
-    plan[form->hashs[1].i - r][form->hashs[1].j - q] = '.';
-    plan[form->hashs[2].i - r][form->hashs[2].j - q] = '.';
-    plan[form->hashs[3].i - r][form->hashs[3].j - q] = '.';
+    r = form.P1.y - coord.y;
+    q = form.P1.x - coord.x;
+    plan[form.P1.y - r][form.P1.x - q] = '.';
+    plan[form.P2.y - r][form.P2.x - q] = '.';
+    plan[form.P3.y - r][form.P3.x - q] = '.';
+    plan[form.P4.y - r][form.P4.x - q] = '.';
     return (plan);
 }
 
@@ -77,28 +77,28 @@ void affiche_plan(char **plan, t_point size)
     }
 }
 
-int check_availibity(char **plan, t_form *form, t_point size, t_point coord)
+int check_availibity(char **plan, t_form form, t_point size, t_point coord)
 {
     int r;
     int q;
 
-    r = form->hashs[0].i - coord.y;
-    q = form->hashs[0].j - coord.x;
-    if (form->hashs[0].i - r + 1 > size.y || form->hashs[0].j - q + 1 > size.x)
+    r = form.P1.y - coord.y;
+    q = form.P1.x - coord.x;
+    if (form.P1.y - r + 1 > size.y || form.P1.x - q + 1 > size.x)
         return (0);
-    if (form->hashs[1].i - r + 1 > size.y || form->hashs[1].j - q + 1 > size.x)
+    if (form.P2.y - r + 1 > size.y || form.P2.x - q + 1 > size.x)
         return (0);
-    if (form->hashs[2].i - r + 1 > size.y || form->hashs[2].j - q + 1 > size.x)
+    if (form.P3.y - r + 1 > size.y || form.P3.x - q + 1 > size.x)
         return (0);
-    if (form->hashs[3].i - r + 1 > size.y || form->hashs[3].j - q + 1 > size.x)
+    if (form.P4.y - r + 1 > size.y || form.P4.x - q + 1 > size.x)
         return (0);
-    if (plan[form->hashs[0].i - r][form->hashs[0].j - q] != '.')
+    if (plan[form.P1.y - r][form.P1.x - q] != '.')
         return (0);
-    if (plan[form->hashs[1].i - r][form->hashs[1].j - q] != '.')
+    if (plan[form.P2.y - r][form.P2.x - q] != '.')
         return (0);
-    if (plan[form->hashs[2].i - r][form->hashs[2].j - q] != '.')
+    if (plan[form.P3.y- r][form.P3.x - q] != '.')
         return (0);
-    if (plan[form->hashs[3].i - r][form->hashs[3].j - q] != '.')
+    if (plan[form.P4.y - r][form.P4.x - q] != '.')
         return (0);
     return (1);
 }
@@ -122,50 +122,79 @@ char    **copy_plan(char **plan, char **plan_tmp, t_point size)
     return (plan_tmp);
 }
 
-
-t_point get_free_place(char **plan, t_form *form, t_point start, t_point size)
+t_point get_free_place_new(char **plan, t_form form, t_point start, t_point size)
 {
-    t_point coord;
+    if (check_availibity(plan, form, size, start))
+        return (start);
+    else
+    {
+        start.x++;
+        if(start.x == size.x)
+        {
+            start.x = 0;
+            start.y++;
+        }
+        if (start.y == size.y)
+        {
+            start.x = size.x - 1;
+            start.y = size.y - 1;
+            return (start);
+        }
+        return (get_free_place_new(plan, form, start, size));
+    }
+}
 
+t_point get_free_place(char **plan, t_form form, t_point start, t_point size)
+{
     while(start.y < size.y)
     {
         while (start.x < size.x)
         {
-            coord.x = start.x;
-            coord.y = start.y;
-            if (check_availibity(plan, form, size, coord))
-                return (coord);
+            if (check_availibity(plan, form, size, start))
+                return (start);
             start.x++;
         }
         start.x = 0;
         start.y++;
     }
-    return (coord);
+    start.x = size.x - 1;
+    start.y = size.y - 1;
+    return (start);
 }
 
-int solve_forms(char **plan, t_form *forms[26], t_point start, t_point size, int i)
+int solve_forms(char **plan, t_form forms[27], t_point start[2], t_point size)
 {
     t_point place;
     t_point new_start;
 
-    if (forms[i] == NULL)
+    if (start[1].x == start[1].y)
         return (1);
     new_start.x = 0;
     new_start.y = 0;
-    place = get_free_place(plan,forms[i], start, size);
+    place = get_free_place(plan, forms[start[1].x], start[0], size);
     if (place.x != size.x - 1 || place.y != size.y - 1)
         {
-            plan = add_to_plan(plan, forms[i], place);
-            if (solve_forms(plan, forms, new_start, size, i + 1) == 0)
-            {
-                plan = remove_from_plan(plan, forms[i], place);
-                start.x++;
-                if(start.x == 4)
+            plan = add_to_plan(plan, forms[start[1].x], place);
+            affiche_plan(plan, size);
+            ft_putchar('\n');
+            start[0] = new_start;
+            start[1].x++;
+            if (solve_forms(plan, forms, start, size) == 0)
+            {   
+                start[1].x--;
+                plan = remove_from_plan(plan, forms[start[1].x], place);
+                if(start[1].y - start[1].x + 1 > start[1].y / 2)
+                    return(0);
+                place.x++;
+                if(place.x == size.x)
                 {
-                    start.x = 0;
-                    start.y++;
+                    place.x = 0;
+                    place.y++;
                 }
-                return (solve_forms(plan, forms, start, size, i));
+                if (place.y == size.y)
+                    return(0);
+                start[0] = place;
+                return (solve_forms(plan, forms, start, size));
             }
         }
     else 
@@ -175,16 +204,20 @@ int solve_forms(char **plan, t_form *forms[26], t_point start, t_point size, int
 
 int main()
 {
-    char *buffer,*buffer2,*buffer3,*buffer4,*buffer5,*buffer6,*buffer7,*buffer8;
-    t_form *forms[26];
+    char *buffer,*buffer2,*buffer3,*buffer4,*buffer5,*buffer6,*buffer7,*buffer8,*buffer9,*buffer10,*buffer11,*buffer12,*buffer13,*buffer14,*buffer15,*buffer16;
+    char *buffer17,*buffer18,*buffer19,*buffer20,*buffer21,*buffer22,*buffer23,*buffer24,*buffer25,*buffer26;
+    t_form forms[27];
     char **plan;
     t_point size;
-    t_point start;
+    t_point start[2];
     t_point old_size;
 
 
-    size.x = size.y = ft_nextsqrt(8 * 4);
-    start.x = start.y = 0;
+    size.x = size.y = ft_nextsqrt((26 * 4) + 1);
+    //ft_putnbr(size.x);
+    start[0].x = start[0].y = 0;
+    start[1].x = 0;
+    start[1].y = 26;
     plan = creat_plan(size);
     buffer = ft_strdup("...#\n...#\n...#\n...#\n");
     buffer2 = ft_strdup("....\n....\n....\n####\n");
@@ -194,6 +227,24 @@ int main()
     buffer6 = ft_strdup("....\n....\n##..\n.##.\n");
     buffer7 = ft_strdup("##..\n.#..\n.#..\n....\n");
     buffer8 = ft_strdup("....\n###.\n.#..\n....\n");
+    buffer9 = ft_strdup("...#\n...#\n...#\n...#\n");
+    buffer10 = ft_strdup("....\n....\n....\n####\n");
+    buffer11 = ft_strdup(".###\n...#\n....\n....\n");
+    buffer12 = ft_strdup("....\n..##\n.##.\n....\n");
+    buffer13 = ft_strdup("....\n.##.\n.##.\n....\n");
+    buffer14 = ft_strdup("....\n....\n##..\n.##.\n");
+    buffer15 = ft_strdup("##..\n.#..\n.#..\n....\n");
+    buffer16 = ft_strdup("....\n###.\n.#..\n....\n");
+    buffer17 = ft_strdup("...#\n...#\n...#\n...#\n");
+    buffer18 = ft_strdup("....\n....\n....\n####\n");
+    buffer19 = ft_strdup(".###\n...#\n....\n....\n");
+    buffer20 = ft_strdup("....\n..##\n.##.\n....\n");
+    buffer21 = ft_strdup("....\n.##.\n.##.\n....\n");
+    buffer22 = ft_strdup("....\n....\n##..\n.##.\n");
+    buffer23 = ft_strdup("##..\n.#..\n.#..\n....\n");
+    buffer24 = ft_strdup("....\n###.\n.#..\n....\n");
+    buffer25 = ft_strdup("...#\n...#\n...#\n...#\n");
+    buffer26 = ft_strdup("....\n....\n....\n####\n");
 
     forms[0] = creat_form(buffer);
     forms[1] = creat_form(buffer2);
@@ -203,8 +254,26 @@ int main()
     forms[5] = creat_form(buffer6);
     forms[6] = creat_form(buffer7);
     forms[7] = creat_form(buffer8);
-    forms[8] = NULL;
-    while (solve_forms(plan, forms, start, size, 0) == 0)
+    forms[8] = creat_form(buffer9);
+    forms[9] = creat_form(buffer10);
+    forms[10] = creat_form(buffer11);
+    forms[11] = creat_form(buffer12);
+    forms[12] = creat_form(buffer13);
+    forms[13] = creat_form(buffer14);
+    forms[14] = creat_form(buffer15);
+    forms[15] = creat_form(buffer16);
+    forms[16] = creat_form(buffer17);
+    forms[17] = creat_form(buffer18);
+    forms[18] = creat_form(buffer19);
+    forms[19] = creat_form(buffer20);
+    forms[20] = creat_form(buffer21);
+    forms[21] = creat_form(buffer22);
+    forms[22] = creat_form(buffer23);
+    forms[23] = creat_form(buffer24);
+    forms[24] = creat_form(buffer25);
+    forms[25] = creat_form(buffer26);
+    //forms[26] = NULL;
+    while (solve_forms(plan, forms, start, size) == 0)
     {
         old_size = size;
         size.x = ++size.y;
