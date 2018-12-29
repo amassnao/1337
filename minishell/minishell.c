@@ -10,7 +10,6 @@ void  calc_arg_len(char *syntax, char c, int *len)
 {
     if ((c == 0 && *syntax == ' ' ) || !*syntax)
         return ;
-
     if (*syntax == c)
         return (calc_arg_len(++syntax, 0, len));
 
